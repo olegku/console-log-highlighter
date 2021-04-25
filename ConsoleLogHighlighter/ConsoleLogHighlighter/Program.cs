@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace ConsoleLogHighlighter
 {
@@ -6,7 +7,20 @@ namespace ConsoleLogHighlighter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            using (var reader = new StreamReader("Sample.log"))
+            {
+                Console.SetIn(reader);
+
+                using (new ConsoleLogHighlighter())
+                {
+                    while (Console.ReadLine() is string line)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+
+                Console.OpenStandardOutput();
+            }
         }
     }
 }
