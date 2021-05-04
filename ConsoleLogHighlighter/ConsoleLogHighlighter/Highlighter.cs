@@ -2,28 +2,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace ConsoleLogHighlighter
 {
-    public class Highlighter : IEnumerable
+    public class Highlighter
     {
         private readonly Dictionary<string, string> m_patternKeys = new Dictionary<string, string>();
         private readonly Dictionary<string, string> m_styles = new Dictionary<string, string>();
 
-        public void Add([RegexPattern] string regexPattern, string styleKey)
-        {
-            if (regexPattern == null) throw new ArgumentNullException(nameof(regexPattern));
-            if (regexPattern == null) throw new ArgumentNullException(nameof(regexPattern));
-            var testRegex = new Regex(regexPattern);
-            m_patternKeys.Add(regexPattern, styleKey);
-        }
-
         public void AddStyle(string styleKey, string style)
         {
             m_styles[styleKey] = style;
+        }
+
+        public void AddPattern([RegexPattern] string regexPattern, string styleKey)
+        {
+            if (regexPattern == null) throw new ArgumentNullException(nameof(regexPattern));
+            if (regexPattern == null) throw new ArgumentNullException(nameof(regexPattern));
+
+            // TODO: odd regexPatten validation, redo
+            new Regex(regexPattern);
+            m_patternKeys.Add(regexPattern, styleKey);
         }
 
         public string Transform(string input)
@@ -47,7 +48,7 @@ namespace ConsoleLogHighlighter
             var style = GetStyle(match);
             if (style != null)
             {
-                return $"{style}{match.Value}\x1B[m";
+                return $"{style}{match.Value}{Styles.Default}";
             }
 
             return match.Value;
